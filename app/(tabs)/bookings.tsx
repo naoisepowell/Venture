@@ -3,11 +3,11 @@ import { StyleSheet } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 
-export default function DashboardScreen() {
+export default function BookingsScreen() {
   return (
     <ThemedView style={styles.container}>
-      <ThemedText type="title">Dashboard</ThemedText>
-      <ThemedText>Your travel overview will appear here.</ThemedText>
+      <ThemedText type="title">Bookings</ThemedText>
+      <ThemedText>Your reservations and bookings will appear here.</ThemedText>
     </ThemedView>
   );
 }
