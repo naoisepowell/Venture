@@ -21,7 +21,7 @@ export default function RegisterScreen() {
     setLoading(true);
     setError("");
     try {
-      await register(email, password, name);
+      await register(name, email, password);
       router.replace("/(tabs)/dashboard");
     } catch (err) {
       setError(

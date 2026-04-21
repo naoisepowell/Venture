@@ -38,6 +38,7 @@ export default function LoginScreen() {
       />
 
       <View style={styles.form}>
+        {error ? <Text style={styles.error}>{error}</Text> : null}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Email</Text>
           <TextInput
@@ -118,5 +119,10 @@ const styles = StyleSheet.create({
   link: {
     color: colours.primary,
     fontWeight: "600",
+  },
+  error: {
+    ...typography.caption,
+    color: colours.danger,
+    marginBottom: spacing.base,
   },
 });
