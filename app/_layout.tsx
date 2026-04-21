@@ -86,6 +86,7 @@ export default function RootLayout() {
         />
         <Stack.Screen name="trip/form" options={{ animation: "slide_from_bottom" }} />
         <Stack.Screen name="categories" />
+        <Stack.Screen name="category/form" options={{ animation: "slide_from_bottom" }} />
         <Stack.Screen name="targets" />
       </Stack>
     </AuthProvider>
