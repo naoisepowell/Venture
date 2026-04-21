@@ -4,9 +4,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Pressable, StyleSheet } from "react-native";
 
+// categories screen for users to create and manage custom categories for their travel activities
 export default function CategoriesScreen() {
   const router = useRouter();
 
+  // Render categories screen with header and empty state
   return (
     <ScreenContainer>
       <Pressable onPress={() => router.back()} style={styles.backButton}>

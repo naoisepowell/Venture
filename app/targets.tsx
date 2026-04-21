@@ -4,9 +4,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Pressable, StyleSheet } from "react-native";
 
+// targets screen for users to set and manage their travel goals and milestones
 export default function TargetsScreen() {
   const router = useRouter();
 
+  // Render targets screen with header and empty state
   return (
     <ScreenContainer>
       <Pressable onPress={() => router.back()} style={styles.backButton}>

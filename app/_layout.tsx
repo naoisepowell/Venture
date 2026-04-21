@@ -1,3 +1,4 @@
+import { AuthProvider } from "@/src/auth";
 import { initialiseDatabase } from "@/src/db/init";
 import { colours } from "@/src/theme";
 import { Stack } from "expo-router";
@@ -6,12 +7,15 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 
+
 SplashScreen.preventAutoHideAsync();
 
+// checks if app is ready to load
 export default function RootLayout() {
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Prepares the app by initializing the database and handling any errors
   useEffect(() => {
     let isMounted = true;
 
@@ -39,10 +43,12 @@ export default function RootLayout() {
     };
   }, []);
 
+  // shows nothing while app is loading
   if (!ready && !error) {
     return null;
   }
 
+  // error message if app setup fails
   if (error) {
     return (
       <View
@@ -60,8 +66,9 @@ export default function RootLayout() {
     );
   }
 
+  // renders the app if setup is successful
   return (
-    <>
+    <AuthProvider>
       <StatusBar style="dark" />
       <Stack
         screenOptions={{
@@ -80,6 +87,6 @@ export default function RootLayout() {
         <Stack.Screen name="categories" />
         <Stack.Screen name="targets" />
       </Stack>
-    </>
+    </AuthProvider>
   );
 }

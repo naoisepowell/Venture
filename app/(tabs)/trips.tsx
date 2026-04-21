@@ -1,5 +1,6 @@
-import { ScreenContainer, AppHeader, EmptyState } from "@/src/components";
+import { AppHeader, EmptyState, ScreenContainer } from "@/src/components";
 
+// trips screen to display user's planned trips and itineraries
 export default function TripsScreen() {
   return (
     <ScreenContainer>

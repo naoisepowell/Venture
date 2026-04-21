@@ -1,9 +1,12 @@
-import { StyleSheet, Text, View, Pressable } from "react-native";
+import { useAuth } from "@/src/auth";
+import { AppHeader, PrimaryButton, ScreenContainer } from "@/src/components";
+import { colours, radii, spacing, typography } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { ScreenContainer, AppHeader } from "@/src/components";
-import { colours, typography, spacing, radii } from "@/src/theme";
+import { useState } from "react";
+import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 
+// settings screen for users to manage their profile, categories, targets, and app preferences
 const SETTINGS_ITEMS: {
   icon: keyof typeof Ionicons.glyphMap;
   label: string;
@@ -16,12 +19,47 @@ const SETTINGS_ITEMS: {
   { icon: "information-circle-outline", label: "About" },
 ];
 
+// settings screen for users to manage their profile, categories, targets, and app preferences
 export default function SettingsScreen() {
   const router = useRouter();
+  const { user, logout, deleteProfile } = useAuth();
+  const [loggingOut, setLoggingOut] = useState(false);
 
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    try {
+      await logout();
+      router.replace("/(auth)/login");
+    } finally {
+      setLoggingOut(false);
+    }
+  };
+
+  // Deletes user, logs them out and redirects to welcome page
+  const handleDeleteProfile = () => {
+    Alert.alert(
+      "Delete Profile",
+      "Are you sure you want to delete your profile? This action cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            await deleteProfile();
+            router.replace("/(auth)/welcome");
+          }
+        },
+      ]
+    );
+  };
+
+  // Render settings options
   return (
     <ScreenContainer>
-      <AppHeader title="Settings" />
+      <AppHeader 
+      title="Settings"
+      subtitle={user ? user.name : undefined} />
 
       <View style={styles.list}>
         {SETTINGS_ITEMS.map((item) => (
@@ -48,6 +86,17 @@ export default function SettingsScreen() {
             />
           </Pressable>
         ))}
+      </View>
+      <View style={styles.actions}>
+        <PrimaryButton
+          title="Log Out"
+          onPress={handleLogout}
+          loading={loggingOut}
+          />
+
+          <Pressable onPress={handleDeleteProfile} style={styles.deleteButton}>
+            <Text style={styles.deleteText}>Delete Profile</Text>
+          </Pressable>
       </View>
     </ScreenContainer>
   );
@@ -82,5 +131,17 @@ const styles = StyleSheet.create({
   rowLabel: {
     ...typography.body,
     color: colours.textPrimary,
+  },
+  actions: {
+    marginTop: spacing.lg,
+    gap: spacing.base,
+  },
+  deleteButton: {
+    paddingVertical: spacing.sm,
+    alignItems: "center",
+  },
+  deleteText: {
+    ...typography.captionMedium,
+    color: colours.danger,
   },
 });

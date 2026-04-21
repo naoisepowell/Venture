@@ -1,10 +1,34 @@
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { useAuth } from "@/src/auth";
+import { AppHeader, PrimaryButton, ScreenContainer } from "@/src/components";
+import { colours, radii, spacing, typography } from "@/src/theme";
 import { useRouter } from "expo-router";
-import { ScreenContainer, AppHeader, PrimaryButton } from "@/src/components";
-import { colours, typography, spacing, radii } from "@/src/theme";
+import { useState } from "react";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { login } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // handles login process and sends user to dashboard
+  const handleLogin = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      await login(email, password);
+      router.replace("/(tabs)/dashboard");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Login failed. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <ScreenContainer>
@@ -22,6 +46,8 @@ export default function LoginScreen() {
             placeholderTextColor={colours.textTertiary}
             keyboardType="email-address"
             autoCapitalize="none"
+            value={email}
+            onChangeText={setEmail}
           />
         </View>
 
@@ -32,12 +58,15 @@ export default function LoginScreen() {
             placeholder="Enter your password"
             placeholderTextColor={colours.textTertiary}
             secureTextEntry
+            value={password}
+            onChangeText={setPassword}
           />
         </View>
 
         <PrimaryButton
           title="Sign In"
-          onPress={() => router.replace("/(tabs)/dashboard")}
+          onPress={handleLogin}
+          loading={loading}
           style={styles.button}
         />
 
