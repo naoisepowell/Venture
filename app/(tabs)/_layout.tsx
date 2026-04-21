@@ -1,35 +1,80 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import { Tabs } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { colours, typography } from "@/src/theme";
 
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+type TabIcon = keyof typeof Ionicons.glyphMap;
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+const TAB_CONFIG: {
+  name: string;
+  title: string;
+  iconFocused: TabIcon;
+  iconDefault: TabIcon;
+}[] = [
+  {
+    name: "dashboard",
+    title: "Dashboard",
+    iconFocused: "grid",
+    iconDefault: "grid-outline",
+  },
+  {
+    name: "trips",
+    title: "Trips",
+    iconFocused: "airplane",
+    iconDefault: "airplane-outline",
+  },
+  {
+    name: "activities",
+    title: "Activities",
+    iconFocused: "list",
+    iconDefault: "list-outline",
+  },
+  {
+    name: "insights",
+    title: "Insights",
+    iconFocused: "bar-chart",
+    iconDefault: "bar-chart-outline",
+  },
+  {
+    name: "settings",
+    title: "Settings",
+    iconFocused: "cog",
+    iconDefault: "cog-outline",
+  },
+];
 
+export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
-        tabBarButton: HapticTab,
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
+        tabBarActiveTintColor: colours.primary,
+        tabBarInactiveTintColor: colours.tabInactive,
+        tabBarLabelStyle: typography.tabLabel,
+        tabBarStyle: {
+          backgroundColor: colours.surface,
+          borderTopColor: colours.borderLight,
+          borderTopWidth: 1,
+          paddingBottom: 4,
+          height: 56,
+        },
+      }}
+    >
+      {TAB_CONFIG.map((tab) => (
+        <Tabs.Screen
+          key={tab.name}
+          name={tab.name}
+          options={{
+            title: tab.title,
+            tabBarIcon: ({ focused, color, size }) => (
+              <Ionicons
+                name={focused ? tab.iconFocused : tab.iconDefault}
+                size={size}
+                color={color}
+              />
+            ),
+          }}
+        />
+      ))}
     </Tabs>
   );
 }
