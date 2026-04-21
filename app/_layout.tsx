@@ -84,6 +84,7 @@ export default function RootLayout() {
           name="trip/[id]"
           options={{ animation: "slide_from_bottom" }}
         />
+        <Stack.Screen name="trip/form" options={{ animation: "slide_from_bottom" }} />
         <Stack.Screen name="categories" />
         <Stack.Screen name="targets" />
       </Stack>
