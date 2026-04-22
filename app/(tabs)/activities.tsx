@@ -8,7 +8,15 @@ import { Ionicons } from "@expo/vector-icons";
 import { desc, eq } from "drizzle-orm";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { Alert, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  Alert,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
 // Shape of each activity row from joining activity, trip and category data
 interface ActivityRow {
@@ -19,8 +27,10 @@ interface ActivityRow {
   metricValue: number;
   status: string;
   location: string | null;
+  notes: string | null;
   tripId: number;
   tripTitle: string;
+  categoryId: number;
   categoryName: string;
   categoryColour: string;
   categoryIcon: string;
@@ -32,7 +42,14 @@ interface TripOption {
   title: string;
 }
 
-// status filter options
+// Category options for filtering
+interface CategoryOption {
+  id: number;
+  name: string;
+  colour: string;
+}
+
+// Status filter options
 const STATUS_FILTERS = [
   { value: "all", label: "All" },
   { value: "planned", label: "Planned" },
@@ -41,16 +58,36 @@ const STATUS_FILTERS = [
   { value: "cancelled", label: "Cancelled" },
 ];
 
-// 
+//
 export default function ActivitiesScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const [activityList, setActivityList] = useState<ActivityRow[]>([]); // Stores activities
   const [tripOptions, setTripOptions] = useState<TripOption[]>([]); // Stores trip filter options
+  const [categoryOptions, setCategoryOptions] = useState<CategoryOption[]>([]); // Stores category filter options
+
+  // Search and filter state
+  const [searchText, setSearchText] = useState("");
   const [filterTrip, setFilterTrip] = useState<number | null>(null);
+  const [filterCategory, setFilterCategory] = useState<number | null>(null);
   const [filterStatus, setFilterStatus] = useState("all");
 
-  // Reloads trips and activities
+  // Checks if any filter is currently active
+  const hasActiveFilters =
+    searchText !== "" ||
+    filterTrip !== null ||
+    filterCategory !== null ||
+    filterStatus !== "all";
+
+  // Resets all filters and search back to defaults
+  const clearFilters = () => {
+    setSearchText("");
+    setFilterTrip(null);
+    setFilterCategory(null);
+    setFilterStatus("all");
+  };
+
+  // Reloads trips, categories and activities
   useFocusEffect(
     useCallback(() => {
       if (!user) return;
@@ -63,7 +100,14 @@ export default function ActivitiesScreen() {
           .orderBy(trips.title);
         setTripOptions(t);
 
-        // loads activities and join them with trip and category data
+        const c = await db // Loads users categories for filtering
+          .select({ id: categories.id, name: categories.name, colour: categories.colour })
+          .from(categories)
+          .where(eq(categories.userId, user.id))
+          .orderBy(categories.name);
+        setCategoryOptions(c);
+
+        // Loads activities and joins them with trip and category data
         const rows = await db
           .select({
             id: activities.id,
@@ -73,8 +117,10 @@ export default function ActivitiesScreen() {
             metricValue: activities.metricValue,
             status: activities.status,
             location: activities.location,
+            notes: activities.notes,
             tripId: activities.tripId,
             tripTitle: trips.title,
+            categoryId: activities.categoryId,
             categoryName: categories.name,
             categoryColour: categories.colour,
             categoryIcon: categories.icon,
@@ -90,14 +136,25 @@ export default function ActivitiesScreen() {
     }, [user])
   );
 
-  // Filters activities based on selected trip and status filters
+  // Filters activities based on search text, trip, category and status
   const filtered = activityList.filter((a) => {
     if (filterTrip && a.tripId !== filterTrip) return false;
+    if (filterCategory && a.categoryId !== filterCategory) return false;
     if (filterStatus !== "all" && a.status !== filterStatus) return false;
+
+    // Text search matches against title, notes and location
+    if (searchText.trim()) {
+      const q = searchText.trim().toLowerCase();
+      const matchesTitle = a.title.toLowerCase().includes(q);
+      const matchesNotes = a.notes?.toLowerCase().includes(q) ?? false;
+      const matchesLocation = a.location?.toLowerCase().includes(q) ?? false;
+      if (!matchesTitle && !matchesNotes && !matchesLocation) return false;
+    }
+
     return true;
   });
 
-  // Confirmatio before deleting an activity
+  // Confirmation before deleting an activity
   const handleDelete = (item: ActivityRow) => {
     Alert.alert(
       "Delete Activity",
@@ -109,7 +166,7 @@ export default function ActivitiesScreen() {
           style: "destructive",
           onPress: async () => {
             await db.delete(activities).where(eq(activities.id, item.id));
-            setActivityList((prev) => prev.filter((a)  => a.id !== item.id)); // Removes deleted item from local state
+            setActivityList((prev) => prev.filter((a) => a.id !== item.id)); // Removes deleted item from local state
           },
         },
       ]
@@ -118,7 +175,7 @@ export default function ActivitiesScreen() {
 
   return (
     <ScreenContainer>
-      // Title and Add button
+      {/* Title and Add button */}
       <View style={styles.headerRow}>
         <AppHeader title="Activities" subtitle="Things to do on your trips" />
         <Pressable
@@ -129,23 +186,31 @@ export default function ActivitiesScreen() {
         </Pressable>
       </View>
 
-      // Filter section
+      {/* Search bar */}
+      <View style={styles.searchRow}>
+        <Ionicons name="search-outline" size={18} color={colours.textTertiary} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search activities..."
+          placeholderTextColor={colours.textTertiary}
+          value={searchText}
+          onChangeText={setSearchText}
+          autoCapitalize="none"
+        />
+        {searchText !== "" ? (
+          <Pressable onPress={() => setSearchText("")}>
+            <Ionicons name="close-circle" size={18} color={colours.textTertiary} />
+          </Pressable>
+        ) : null}
+      </View>
       <View style={styles.filterSection}>
-        // Trip filters
+        // Trip filters 
         <View style={styles.filterRow}>
           <Pressable
             onPress={() => setFilterTrip(null)}
-            style={[
-              styles.filterChip,
-              !filterTrip && styles.filterChipActive,
-            ]}
+            style={[styles.filterChip, !filterTrip && styles.filterChipActive]}
           >
-            <Text
-              style={[
-                styles.filterChipText,
-                !filterTrip && styles.filterChipTextActive,
-              ]}
-            >
+            <Text style={[styles.filterChipText, !filterTrip && styles.filterChipTextActive]}>
               All Trips
             </Text>
           </Pressable>
@@ -153,16 +218,10 @@ export default function ActivitiesScreen() {
             <Pressable
               key={t.id}
               onPress={() => setFilterTrip(filterTrip === t.id ? null : t.id)}
-              style={[
-                styles.filterChip,
-                filterTrip === t.id && styles.filterChipActive,
-              ]}
+              style={[styles.filterChip, filterTrip === t.id && styles.filterChipActive]}
             >
               <Text
-                style={[
-                  styles.filterChipText,
-                  filterTrip === t.id && styles.filterChipTextActive,
-                ]}
+                style={[styles.filterChipText, filterTrip === t.id && styles.filterChipTextActive]}
                 numberOfLines={1}
               >
                 {t.title}
@@ -171,31 +230,65 @@ export default function ActivitiesScreen() {
           ))}
         </View>
 
-        // Status filters
+        // Category filters
         <View style={styles.filterRow}>
-          {STATUS_FILTERS.map((s) => (
+          <Pressable
+            onPress={() => setFilterCategory(null)}
+            style={[styles.filterChip, !filterCategory && styles.filterChipActive]}
+          >
+            <Text style={[styles.filterChipText, !filterCategory && styles.filterChipTextActive]}>
+              All Categories
+            </Text>
+          </Pressable>
+          {categoryOptions.map((c) => (
             <Pressable
-              key={s.value}
-              onPress={() => setFilterStatus(s.value)}
+              key={c.id}
+              onPress={() => setFilterCategory(filterCategory === c.id ? null : c.id)}
               style={[
                 styles.filterChip,
-                filterStatus === s.value && styles.filterChipActive,
+                filterCategory === c.id && {
+                  backgroundColor: c.colour + "18",
+                  borderColor: c.colour,
+                },
               ]}
             >
               <Text
                 style={[
                   styles.filterChipText,
-                  filterStatus === s.value && styles.filterChipTextActive,
+                  filterCategory === c.id && { color: c.colour, fontWeight: "600" as const },
                 ]}
+                numberOfLines={1}
               >
+                {c.name}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+
+        // Status filters 
+        <View style={styles.filterRow}>
+          {STATUS_FILTERS.map((s) => (
+            <Pressable
+              key={s.value}
+              onPress={() => setFilterStatus(s.value)}
+              style={[styles.filterChip, filterStatus === s.value && styles.filterChipActive]}
+            >
+              <Text style={[styles.filterChipText, filterStatus === s.value && styles.filterChipTextActive]}>
                 {s.label}
               </Text>
             </Pressable>
           ))}
         </View>
+
+        // Clears all filters
+        {hasActiveFilters ? (
+          <Pressable onPress={clearFilters} style={styles.clearButton}>
+            <Ionicons name="refresh-outline" size={14} color={colours.primary} />
+            <Text style={styles.clearButtonText}>Clear Filters</Text>
+          </Pressable>
+        ) : null}
       </View>
 
-      // Empty state if no activities, or nor matches after filtering
       {filtered.length === 0 ? (
         <EmptyState
           icon="footsteps-outline"
@@ -203,7 +296,7 @@ export default function ActivitiesScreen() {
           message={
             activityList.length === 0
               ? "Create your first activity to start tracking."
-              : "Try changing the filters above."
+              : "Try changing the search or filters."
           }
         />
       ) : (
@@ -243,6 +336,25 @@ const styles = StyleSheet.create({
   addButton: {
     paddingTop: spacing.lg,
   },
+  searchRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    height: 42,
+    borderWidth: 1,
+    borderColor: colours.border,
+    borderRadius: radii.md,
+    paddingHorizontal: spacing.md,
+    backgroundColor: colours.surface,
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+  searchInput: {
+    flex: 1,
+    ...typography.caption,
+    color: colours.textPrimary,
+    height: 42,
+    padding: 0,
+  },
   filterSection: {
     gap: spacing.sm,
     marginBottom: spacing.md,
@@ -271,6 +383,18 @@ const styles = StyleSheet.create({
   filterChipTextActive: {
     color: colours.primary,
     fontWeight: "600",
+  },
+  clearButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.xs,
+    paddingVertical: spacing.xs,
+  },
+  clearButtonText: {
+    ...typography.small,
+    color: colours.primary,
+    fontWeight: "500",
   },
   list: {
     gap: spacing.md,
