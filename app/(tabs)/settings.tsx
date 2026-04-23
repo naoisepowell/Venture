@@ -1,6 +1,8 @@
 import { useAuth } from "@/src/auth";
 import { AppHeader, PrimaryButton, ScreenContainer } from "@/src/components";
+import { seedDatabase } from "@/src/db/seed";
 import { colours, radii, spacing, typography } from "@/src/theme";
+import { exportActivitiesCsv } from "@/src/utils/exportCsv";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -11,10 +13,12 @@ const SETTINGS_ITEMS: {
   icon: keyof typeof Ionicons.glyphMap;
   label: string;
   route?: string;
+  action?: string;
 }[] = [
   { icon: "person-outline", label: "Profile" },
   { icon: "pricetags-outline", label: "Categories", route: "/categories" },
   { icon: "flag-outline", label: "Targets", route: "/targets" },
+  { icon: "download-outline", label: "Export Activities CSV", action: "export" },
   { icon: "notifications-outline", label: "Notifications" },
   { icon: "information-circle-outline", label: "About" },
 ];
@@ -24,6 +28,24 @@ export default function SettingsScreen() {
   const router = useRouter();
   const { user, logout, deleteProfile } = useAuth();
   const [loggingOut, setLoggingOut] = useState(false);
+
+  const handleExport = async () => {
+    if (!user) return;
+    try {
+      await exportActivitiesCsv(user.id);
+    } catch (err) {
+      Alert.alert(
+        "Export Failed",
+        err instanceof Error ? err.message : "An error occurred while exporting. Please try again."
+      );
+    }
+  };
+
+  const handleSeed = async () => {
+    if (!user) return;
+    await seedDatabase(user.id);
+    Alert.alert("Database seeded with sample data. Go to Dashboard to see it.");
+  }
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -69,7 +91,10 @@ export default function SettingsScreen() {
               styles.row,
               pressed && styles.rowPressed,
             ]}
-            onPress={() => item.route && router.push(item.route as never)}
+            onPress={() => {
+              if (item.action === "export") handleExport();
+              else if (item.route) router.push(item.route as never)
+            }}
           >
             <View style={styles.rowLeft}>
               <Ionicons
@@ -96,6 +121,10 @@ export default function SettingsScreen() {
 
           <Pressable onPress={handleDeleteProfile} style={styles.deleteButton}>
             <Text style={styles.deleteText}>Delete Profile</Text>
+          </Pressable>
+
+          <Pressable onPress={handleSeed} style={styles.deleteButton}>
+            <Text style={[styles.deleteText, {color: colours.info}]}>Seed Database (dev only)</Text>
           </Pressable>
       </View>
     </ScreenContainer>

@@ -8,15 +8,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { desc, eq } from "drizzle-orm";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import {
-  Alert,
-  FlatList,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Alert, FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 // Shape of each activity row from joining activity, trip and category data
 interface ActivityRow {
