@@ -67,6 +67,8 @@ export default function TripsScreen() {
           icon="map-outline"
           title="No trips yet"
           message="Create your first trip and start planning your itinerary."
+          actionLabel="Create Trip"
+          onAction={() => router.push("/trip/form")}
         />
       ) : (
         <FlatList
