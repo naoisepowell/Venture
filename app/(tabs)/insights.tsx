@@ -9,7 +9,6 @@ import { useCallback, useState } from "react";
 import { Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
 
-// Time period options for the chart toggle
 const PERIODS = ["Week", "Month", "Year"] as const;
 type Period = typeof PERIODS[number];
 
@@ -18,24 +17,23 @@ interface ActivityRow {
   metricValue: number;
 }
 
-// Groups activities into labelled buckets depending on the selected period
-function buildBars(rows: ActivityRow[], period: Period, colour: string) {
+// Builds bar chart data grouped by the selected period
+function buildBars(rows: ActivityRow[], period: Period, colour: string, dimColour: string) {
   if (period === "Week") {
-    // Last 7 days, one bar per day
     return Array.from({ length: 7 }, (_, i) => {
       const d = new Date();
       d.setDate(d.getDate() - (6 - i));
       const dateStr = d.toISOString().split("T")[0];
+      const count = rows.filter((r) => r.date === dateStr).length;
       return {
-        value: rows.filter((r) => r.date === dateStr).length,
+        value: count,
         label: d.toLocaleDateString("en-GB", { weekday: "short" }).slice(0, 3),
-        frontColor: colour,
+        frontColor: count > 0 ? colour : dimColour,
       };
     });
   }
 
   if (period === "Month") {
-    // Last 4 weeks, one bar per week
     return Array.from({ length: 4 }, (_, i) => {
       const end = new Date();
       end.setDate(end.getDate() - i * 7);
@@ -44,18 +42,17 @@ function buildBars(rows: ActivityRow[], period: Period, colour: string) {
       return {
         start: start.toISOString().split("T")[0],
         end: end.toISOString().split("T")[0],
-        label: `Wk${4 - i}`,
+        label: `Wk ${4 - i}`,
       };
     })
       .reverse()
-      .map((w) => ({
-        value: rows.filter((r) => r.date >= w.start && r.date <= w.end).length,
-        label: w.label,
-        frontColor: colour,
-      }));
+      .map((w) => {
+        const count = rows.filter((r) => r.date >= w.start && r.date <= w.end).length;
+        return { value: count, label: w.label, frontColor: count > 0 ? colour : dimColour };
+      });
   }
 
-  // Year: last 6 months, one bar per month
+  // Year: last 6 months
   return Array.from({ length: 6 }, (_, i) => {
     const d = new Date();
     d.setDate(1);
@@ -64,17 +61,31 @@ function buildBars(rows: ActivityRow[], period: Period, colour: string) {
     const month = d.getMonth();
     const start = `${year}-${String(month + 1).padStart(2, "0")}-01`;
     const end = `${year}-${String(month + 1).padStart(2, "0")}-31`;
+    const count = rows.filter((r) => r.date >= start && r.date <= end).length;
     return {
-      value: rows.filter((r) => r.date >= start && r.date <= end).length,
+      value: count,
       label: d.toLocaleDateString("en-GB", { month: "short" }),
-      frontColor: colour,
+      frontColor: count > 0 ? colour : dimColour,
     };
   });
 }
 
+// Label shown under the hero number
+const PERIOD_LABEL: Record<Period, string> = {
+  Week: "activities this week",
+  Month: "activities this month",
+  Year: "activities this year",
+};
+
+const CHART_SUBTITLE: Record<Period, string> = {
+  Week: "Last 7 days",
+  Month: "Last 4 weeks",
+  Year: "Last 6 months",
+};
+
 export default function InsightsScreen() {
   const { user } = useAuth();
-  const { colours, theme } = useTheme();
+  const { colours } = useTheme();
   const styles = makeStyles(colours);
   const [period, setPeriod] = useState<Period>("Week");
   const [rows, setRows] = useState<ActivityRow[]>([]);
@@ -82,25 +93,20 @@ export default function InsightsScreen() {
   useFocusEffect(
     useCallback(() => {
       if (!user) return;
-
       (async () => {
-        // Loads all user's activities for aggregation
         const data = await db
           .select({ date: activities.date, metricValue: activities.metricValue })
           .from(activities)
           .innerJoin(trips, eq(activities.tripId, trips.id))
           .where(eq(trips.userId, user.id));
-
         setRows(data);
       })();
     }, [user])
   );
 
-  const barData = buildBars(rows, period, colours.primary);
-  const totalActivities = rows.length;
-  const chartWidth = Dimensions.get("window").width - spacing.base * 2 - 16;
-  const labelColour = colours.textTertiary;
-  const isDark = theme === "dark";
+  const barData = buildBars(rows, period, colours.primary, colours.borderLight);
+  const periodTotal = barData.reduce((s, b) => s + b.value, 0);
+  const chartWidth = Dimensions.get("window").width - spacing.base * 4;
 
   return (
     <ScreenContainer>
@@ -115,54 +121,49 @@ export default function InsightsScreen() {
       ) : (
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
 
-          {/* Summary stats */}
-          <View style={styles.statsRow}>
-            <View style={styles.statCard}>
-              <Text style={styles.statValue}>{totalActivities}</Text>
-              <Text style={styles.statLabel}>Total Activities</Text>
-            </View>
-            <View style={styles.statCard}>
-              <Text style={styles.statValue}>
-                {barData.reduce((s, b) => s + b.value, 0)}
-              </Text>
-              <Text style={styles.statLabel}>This {period}</Text>
-            </View>
-          </View>
-
-          {/* Period toggle */}
-          <View style={styles.toggleRow}>
+          {/* Segmented period control */}
+          <View style={styles.segmented}>
             {PERIODS.map((p) => (
               <Pressable
                 key={p}
                 onPress={() => setPeriod(p)}
-                style={[styles.toggleChip, period === p && styles.toggleChipActive]}
+                style={[styles.segment, period === p && styles.segmentActive]}
               >
-                <Text style={[styles.toggleLabel, period === p && styles.toggleLabelActive]}>
+                <Text style={[styles.segmentLabel, period === p && styles.segmentLabelActive]}>
                   {p}
                 </Text>
               </Pressable>
             ))}
           </View>
 
-          {/* Activity count bar chart */}
+          {/* Hero stat */}
+          <View style={styles.heroCard}>
+            <Text style={styles.heroNumber}>{periodTotal}</Text>
+            <Text style={styles.heroLabel}>{PERIOD_LABEL[period]}</Text>
+            <Text style={styles.heroSub}>{rows.length} total all time</Text>
+          </View>
+
+          {/* Bar chart */}
           <View style={styles.chartCard}>
-            <Text style={styles.chartTitle}>Activities per {period === "Week" ? "day" : period === "Month" ? "week" : "month"}</Text>
+            <Text style={styles.chartTitle}>Activity count</Text>
+            <Text style={styles.chartSub}>{CHART_SUBTITLE[period]}</Text>
             <BarChart
               data={barData}
               width={chartWidth}
-              barWidth={chartWidth / barData.length - 12}
-              spacing={12}
-              noOfSections={4}
+              barWidth={chartWidth / barData.length - 10}
+              spacing={10}
+              noOfSections={Math.min(Math.max(...barData.map((b) => b.value), 2), 5)}
               maxValue={Math.max(...barData.map((b) => b.value), 4)}
-              yAxisTextStyle={{ color: labelColour, fontSize: 11 }}
-              xAxisLabelTextStyle={{ color: labelColour, fontSize: 11 }}
-              yAxisColor={colours.border}
+              hideYAxisText
+              hideAxesAndRules={false}
+              yAxisColor="transparent"
               xAxisColor={colours.border}
               rulesColor={colours.divider}
-              hideRules={false}
-              barBorderRadius={4}
+              barBorderRadius={6}
+              showValuesAsTopLabel
+              topLabelTextStyle={{ ...typography.small, color: colours.textSecondary, marginBottom: 4 }}
+              xAxisLabelTextStyle={{ ...typography.small, color: colours.textTertiary }}
               isAnimated
-              backgroundColor={isDark ? colours.surface : colours.surface}
             />
           </View>
 
@@ -176,53 +177,57 @@ function makeStyles(c: Colours) {
   return StyleSheet.create({
     scroll: {
       paddingBottom: spacing["3xl"],
+      gap: spacing.md,
     },
-    statsRow: {
+    segmented: {
       flexDirection: "row",
-      gap: spacing.sm,
-      marginBottom: spacing.md,
+      backgroundColor: c.borderLight,
+      borderRadius: radii.full,
+      padding: 3,
     },
-    statCard: {
+    segment: {
       flex: 1,
+      paddingVertical: spacing.sm,
+      borderRadius: radii.full,
+      alignItems: "center",
+    },
+    segmentActive: {
       backgroundColor: c.surface,
-      borderRadius: radii.lg,
-      borderWidth: 1,
-      borderColor: c.borderLight,
-      padding: spacing.base,
+      // subtle shadow to lift the active tab
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.1,
+      shadowRadius: 2,
+      elevation: 2,
+    },
+    segmentLabel: {
+      ...typography.captionMedium,
+      color: c.textTertiary,
+    },
+    segmentLabelActive: {
+      color: c.textPrimary,
+    },
+    heroCard: {
+      backgroundColor: c.primary,
+      borderRadius: radii.xl,
+      padding: spacing.xl,
       alignItems: "center",
       gap: spacing.xs,
     },
-    statValue: {
-      ...typography.title,
-      color: c.primary,
+    heroNumber: {
+      fontSize: 56,
+      fontWeight: "700",
+      color: "#FFFFFF",
+      lineHeight: 64,
     },
-    statLabel: {
+    heroLabel: {
+      ...typography.body,
+      color: "rgba(255,255,255,0.85)",
+    },
+    heroSub: {
       ...typography.small,
-      color: c.textSecondary,
-    },
-    toggleRow: {
-      flexDirection: "row",
-      gap: spacing.sm,
-      marginBottom: spacing.md,
-    },
-    toggleChip: {
-      paddingHorizontal: spacing.lg,
-      paddingVertical: spacing.sm,
-      borderRadius: radii.full,
-      borderWidth: 1,
-      borderColor: c.border,
-      backgroundColor: c.surface,
-    },
-    toggleChipActive: {
-      backgroundColor: c.primaryFaint,
-      borderColor: c.primary,
-    },
-    toggleLabel: {
-      ...typography.captionMedium,
-      color: c.textSecondary,
-    },
-    toggleLabelActive: {
-      color: c.primary,
+      color: "rgba(255,255,255,0.55)",
+      marginTop: spacing.xs,
     },
     chartCard: {
       backgroundColor: c.surface,
@@ -230,11 +235,17 @@ function makeStyles(c: Colours) {
       borderWidth: 1,
       borderColor: c.borderLight,
       padding: spacing.base,
-      gap: spacing.md,
+      gap: spacing.xs,
+      overflow: "hidden",
     },
     chartTitle: {
       ...typography.captionMedium,
-      color: c.textSecondary,
+      color: c.textPrimary,
+    },
+    chartSub: {
+      ...typography.small,
+      color: c.textTertiary,
+      marginBottom: spacing.sm,
     },
   });
 }
