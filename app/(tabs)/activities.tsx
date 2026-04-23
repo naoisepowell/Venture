@@ -196,7 +196,6 @@ export default function ActivitiesScreen() {
         ) : null}
       </View>
       <View style={styles.filterSection}>
-        // Trip filters 
         <View style={styles.filterRow}>
           <Pressable
             onPress={() => setFilterTrip(null)}
@@ -222,7 +221,6 @@ export default function ActivitiesScreen() {
           ))}
         </View>
 
-        // Category filters
         <View style={styles.filterRow}>
           <Pressable
             onPress={() => setFilterCategory(null)}
@@ -257,7 +255,6 @@ export default function ActivitiesScreen() {
           ))}
         </View>
 
-        // Status filters 
         <View style={styles.filterRow}>
           {STATUS_FILTERS.map((s) => (
             <Pressable
@@ -272,7 +269,6 @@ export default function ActivitiesScreen() {
           ))}
         </View>
 
-        // Clears all filters
         {hasActiveFilters ? (
           <Pressable onPress={clearFilters} style={styles.clearButton}>
             <Ionicons name="refresh-outline" size={14} color={colours.primary} />

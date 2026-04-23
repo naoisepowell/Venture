@@ -68,7 +68,6 @@ export function ActivityCard({
         pressed && styles.cardPressed,
       ]}
     >
-        // Top part shows title, name and status
       <View style={styles.topRow}>
         <View style={styles.titleArea}>
           <Text style={styles.title} numberOfLines={1}>{title}</Text>
@@ -82,7 +81,6 @@ export function ActivityCard({
         </View>
       </View>
 
-      // Section showing main activity details - date, metric, location
       <View style={styles.detailsRow}>
         <View style={styles.detail}>
           <Ionicons name="calendar-outline" size={13} color={colours.textTertiary} />

@@ -147,7 +147,6 @@ export default function TargetFormScreen() {
         <View style={styles.backButton} />
       </View>
 
-      // Main form content
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}

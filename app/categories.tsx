@@ -82,7 +82,6 @@ export default function CategoriesScreen() {
         subtitle="Organise your activities by type"
       />
 
-      // Shows empty state if no categories, otherwise list of categories
       {categoryList.length === 0 ? (
         <EmptyState
           icon="pricetags-outline"

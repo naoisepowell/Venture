@@ -1,11 +1,12 @@
 import { eq } from "drizzle-orm";
-import { db } from "./client";
+import { db as defaultDb } from "./client";
 import { activities, categories, targets, trips } from "./schema";
 
 // Fills database with sample data for one user
 // Only runs if user doesnt already have trips saved
-export async function seedDatabase(userId: number) {
-  const existing = await db
+export async function seedDatabase(userId: number, injectedDb?: any) {
+    const db = injectedDb ?? defaultDb;
+    const existing = await defaultDb
     .select({ id: trips.id })
     .from(trips)
     .where(eq(trips.userId, userId))

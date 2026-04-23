@@ -88,7 +88,6 @@ export function TargetCard({
         />
       </View>
 
-      // Summary row showing progress and whats left
       <View style={styles.statsRow}>
         <Text style={styles.statText}>
           {currentValue} / {targetValue} {targetMetricType}

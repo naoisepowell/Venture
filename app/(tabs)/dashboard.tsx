@@ -108,7 +108,6 @@ export default function DashboardScreen() {
   );
 
   return (
-    // Main container for dashboard screen with header, stats, upcoming trips, and recent activity sections
     <ScreenContainer>
       <AppHeader title="Dashboard" subtitle="Your travel overview" />
 
