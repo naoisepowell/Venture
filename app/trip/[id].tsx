@@ -1,7 +1,7 @@
 import { ScreenContainer } from "@/src/components";
 import { db } from "@/src/db/client";
 import { trips } from "@/src/db/schema";
-import { colours, radii, shadows, spacing, typography } from "@/src/theme";
+import { useTheme, type Colours, radii, shadows, spacing, typography } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { eq } from "drizzle-orm";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
@@ -32,6 +32,8 @@ function formatDate(d: string): string {
 export default function TripDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const { colours } = useTheme();
+  const styles = makeStyles(colours);
   const [trip, setTrip] = useState<TripDetail | null>(null);
 
   useFocusEffect(
@@ -145,96 +147,98 @@ export default function TripDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  topBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: spacing.sm,
-  },
-  backButton: {
-    paddingVertical: spacing.xs,
-  },
-  topBarActions: {
-    flexDirection: "row",
-    gap: spacing.base,
-  },
-  iconButton: {
-    padding: spacing.xs,
-  },
-  loadingText: {
-    ...typography.body,
-    color: colours.textSecondary,
-    textAlign: "center",
-    marginTop: spacing["2xl"],
-  },
-  scrollContent: {
-    paddingBottom: spacing["3xl"],
-  },
-  colourBanner: {
-    borderRadius: radii.lg,
-    padding: spacing.xl,
-    marginTop: spacing.sm,
-    gap: spacing.sm,
-  },
-  bannerTitle: {
-    ...typography.title,
-    color: "#FFFFFF",
-  },
-  bannerLocation: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.xs,
-  },
-  bannerLocationText: {
-    ...typography.captionMedium,
-    color: "rgba(255,255,255,0.85)",
-  },
-  infoCard: {
-    backgroundColor: colours.surface,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-    borderColor: colours.borderLight,
-    padding: spacing.base,
-    marginTop: spacing.base,
-    ...shadows.sm,
-  },
-  infoRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-    paddingVertical: spacing.xs,
-  },
-  infoLabel: {
-    ...typography.small,
-    color: colours.textTertiary,
-  },
-  infoValue: {
-    ...typography.captionMedium,
-    color: colours.textPrimary,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: colours.divider,
-    marginVertical: spacing.sm,
-  },
-  descriptionCard: {
-    backgroundColor: colours.surface,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-    borderColor: colours.borderLight,
-    padding: spacing.base,
-    marginTop: spacing.md,
-    ...shadows.sm,
-  },
-  descriptionLabel: {
-    ...typography.captionMedium,
-    color: colours.textSecondary,
-    marginBottom: spacing.xs,
-  },
-  descriptionText: {
-    ...typography.body,
-    color: colours.textPrimary,
-    lineHeight: 24,
-  },
-});
+function makeStyles(c: Colours) {
+  return StyleSheet.create({
+    topBar: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingVertical: spacing.sm,
+    },
+    backButton: {
+      paddingVertical: spacing.xs,
+    },
+    topBarActions: {
+      flexDirection: "row",
+      gap: spacing.base,
+    },
+    iconButton: {
+      padding: spacing.xs,
+    },
+    loadingText: {
+      ...typography.body,
+      color: c.textSecondary,
+      textAlign: "center",
+      marginTop: spacing["2xl"],
+    },
+    scrollContent: {
+      paddingBottom: spacing["3xl"],
+    },
+    colourBanner: {
+      borderRadius: radii.lg,
+      padding: spacing.xl,
+      marginTop: spacing.sm,
+      gap: spacing.sm,
+    },
+    bannerTitle: {
+      ...typography.title,
+      color: "#FFFFFF",
+    },
+    bannerLocation: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.xs,
+    },
+    bannerLocationText: {
+      ...typography.captionMedium,
+      color: "rgba(255,255,255,0.85)",
+    },
+    infoCard: {
+      backgroundColor: c.surface,
+      borderRadius: radii.lg,
+      borderWidth: 1,
+      borderColor: c.borderLight,
+      padding: spacing.base,
+      marginTop: spacing.base,
+      ...shadows.sm,
+    },
+    infoRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+      paddingVertical: spacing.xs,
+    },
+    infoLabel: {
+      ...typography.small,
+      color: c.textTertiary,
+    },
+    infoValue: {
+      ...typography.captionMedium,
+      color: c.textPrimary,
+    },
+    divider: {
+      height: 1,
+      backgroundColor: c.divider,
+      marginVertical: spacing.sm,
+    },
+    descriptionCard: {
+      backgroundColor: c.surface,
+      borderRadius: radii.lg,
+      borderWidth: 1,
+      borderColor: c.borderLight,
+      padding: spacing.base,
+      marginTop: spacing.md,
+      ...shadows.sm,
+    },
+    descriptionLabel: {
+      ...typography.captionMedium,
+      color: c.textSecondary,
+      marginBottom: spacing.xs,
+    },
+    descriptionText: {
+      ...typography.body,
+      color: c.textPrimary,
+      lineHeight: 24,
+    },
+  });
+}

@@ -1,17 +1,26 @@
 import { AuthProvider } from "@/src/auth";
 import { initialiseDatabase } from "@/src/db/init";
-import { colours } from "@/src/theme";
+import { ThemeProvider, useTheme } from "@/src/theme";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 
-
 SplashScreen.preventAutoHideAsync();
 
 // checks if app is ready to load
 export default function RootLayout() {
+  return (
+    <ThemeProvider>
+      <RootContent />
+    </ThemeProvider>
+  );
+}
+
+// Inner component so it can read the theme after the provider is set up
+function RootContent() {
+  const { colours, theme } = useTheme();
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -60,8 +69,8 @@ export default function RootLayout() {
           backgroundColor: colours.background,
         }}
       >
-        <StatusBar style="dark" />
-        <Text>{error}</Text>
+        <StatusBar style={theme === "dark" ? "light" : "dark"} />
+        <Text style={{ color: colours.textPrimary }}>{error}</Text>
       </View>
     );
   }
@@ -69,7 +78,7 @@ export default function RootLayout() {
   // renders the app if setup is successful
   return (
     <AuthProvider>
-      <StatusBar style="dark" />
+      <StatusBar style={theme === "dark" ? "light" : "dark"} />
       <Stack
         screenOptions={{
           headerShown: false,

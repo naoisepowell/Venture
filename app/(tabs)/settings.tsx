@@ -1,12 +1,12 @@
 import { useAuth } from "@/src/auth";
 import { AppHeader, PrimaryButton, ScreenContainer } from "@/src/components";
 import { seedDatabase } from "@/src/db/seed";
-import { colours, radii, spacing, typography } from "@/src/theme";
+import { useTheme, type Colours, radii, spacing, typography } from "@/src/theme";
 import { exportActivitiesCsv } from "@/src/utils/exportCsv";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, StyleSheet, Switch, Text, View } from "react-native";
 
 // settings screen for users to manage their profile, categories, targets, and app preferences
 const SETTINGS_ITEMS: {
@@ -27,6 +27,8 @@ const SETTINGS_ITEMS: {
 export default function SettingsScreen() {
   const router = useRouter();
   const { user, logout, deleteProfile } = useAuth();
+  const { colours, theme, toggleTheme } = useTheme();
+  const styles = makeStyles(colours);
   const [loggingOut, setLoggingOut] = useState(false);
 
   const handleExport = async () => {
@@ -79,9 +81,25 @@ export default function SettingsScreen() {
   // Render settings options
   return (
     <ScreenContainer>
-      <AppHeader 
-      title="Settings"
-      subtitle={user ? user.name : undefined} />
+      <AppHeader
+        title="Settings"
+        subtitle={user ? user.name : undefined} />
+
+      {/* Dark mode toggle */}
+      <View style={[styles.list, styles.appearanceSection]}>
+        <View style={styles.row}>
+          <View style={styles.rowLeft}>
+            <Ionicons name="moon-outline" size={22} color={colours.textSecondary} />
+            <Text style={styles.rowLabel}>Dark Mode</Text>
+          </View>
+          <Switch
+            value={theme === "dark"}
+            onValueChange={toggleTheme}
+            trackColor={{ false: colours.border, true: colours.primary }}
+            thumbColor={colours.surface}
+          />
+        </View>
+      </View>
 
       <View style={styles.list}>
         {SETTINGS_ITEMS.map((item) => (
@@ -131,46 +149,51 @@ export default function SettingsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  list: {
-    marginTop: spacing.base,
-    backgroundColor: colours.surface,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-    borderColor: colours.borderLight,
-    overflow: "hidden",
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: spacing.base,
-    paddingVertical: spacing.base,
-    borderBottomWidth: 1,
-    borderBottomColor: colours.divider,
-  },
-  rowPressed: {
-    backgroundColor: colours.primaryFaint,
-  },
-  rowLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-  },
-  rowLabel: {
-    ...typography.body,
-    color: colours.textPrimary,
-  },
-  actions: {
-    marginTop: spacing.lg,
-    gap: spacing.base,
-  },
-  deleteButton: {
-    paddingVertical: spacing.sm,
-    alignItems: "center",
-  },
-  deleteText: {
-    ...typography.captionMedium,
-    color: colours.danger,
-  },
-});
+function makeStyles(c: Colours) {
+  return StyleSheet.create({
+    appearanceSection: {
+      marginBottom: spacing.md,
+    },
+    list: {
+      marginTop: spacing.base,
+      backgroundColor: c.surface,
+      borderRadius: radii.lg,
+      borderWidth: 1,
+      borderColor: c.borderLight,
+      overflow: "hidden",
+    },
+    row: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: spacing.base,
+      paddingVertical: spacing.base,
+      borderBottomWidth: 1,
+      borderBottomColor: c.divider,
+    },
+    rowPressed: {
+      backgroundColor: c.primaryFaint,
+    },
+    rowLeft: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+    },
+    rowLabel: {
+      ...typography.body,
+      color: c.textPrimary,
+    },
+    actions: {
+      marginTop: spacing.lg,
+      gap: spacing.base,
+    },
+    deleteButton: {
+      paddingVertical: spacing.sm,
+      alignItems: "center",
+    },
+    deleteText: {
+      ...typography.captionMedium,
+      color: c.danger,
+    },
+  });
+}

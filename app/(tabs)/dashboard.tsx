@@ -4,7 +4,7 @@ import { ActivityCard } from "@/src/components/ActivityCard";
 import { TripCard } from "@/src/components/TripCard";
 import { db } from "@/src/db/client";
 import { activities, categories, trips } from "@/src/db/schema";
-import { colours, radii, spacing, typography } from "@/src/theme";
+import { useTheme, type Colours, radii, spacing, typography } from "@/src/theme";
 import { desc, eq } from "drizzle-orm";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
@@ -39,6 +39,8 @@ interface RecentActivity {
 export default function DashboardScreen() {
   const router = useRouter();
   const { user } = useAuth();
+  const { colours } = useTheme();
+  const styles = makeStyles(colours);
   const [upcomingTrips, setUpcomingTrips] = useState<TripRow[]>([]);
   const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
   const [totalTrips, setTotalTrips] = useState(0);
@@ -194,47 +196,49 @@ export default function DashboardScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  scroll: {
-    paddingBottom: spacing["3xl"],
-  },
-  statsRow: {
-    flexDirection: "row",
-    gap: spacing.sm,
-    marginBottom: spacing.sm,
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: colours.surface,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-    borderColor: colours.borderLight,
-    padding: spacing.base,
-    alignItems: "center",
-    gap: spacing.xs,
-  },
-  statValue: {
-    ...typography.title,
-    color: colours.primary,
-  },
-  statLabel: {
-    ...typography.small,
-    color: colours.textSecondary,
-  },
-  emptyCard: {
-    backgroundColor: colours.surface,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-    borderColor: colours.borderLight,
-    minHeight: 160,
-  },
-  tripList: {
-    gap: spacing.md,
-  },
-  section: {
-    marginTop: spacing.lg,
-  },
-  activityList: {
-    gap: spacing.md,
-  },
-});
+function makeStyles(c: Colours) {
+  return StyleSheet.create({
+    scroll: {
+      paddingBottom: spacing["3xl"],
+    },
+    statsRow: {
+      flexDirection: "row",
+      gap: spacing.sm,
+      marginBottom: spacing.sm,
+    },
+    statCard: {
+      flex: 1,
+      backgroundColor: c.surface,
+      borderRadius: radii.lg,
+      borderWidth: 1,
+      borderColor: c.borderLight,
+      padding: spacing.base,
+      alignItems: "center",
+      gap: spacing.xs,
+    },
+    statValue: {
+      ...typography.title,
+      color: c.primary,
+    },
+    statLabel: {
+      ...typography.small,
+      color: c.textSecondary,
+    },
+    emptyCard: {
+      backgroundColor: c.surface,
+      borderRadius: radii.lg,
+      borderWidth: 1,
+      borderColor: c.borderLight,
+      minHeight: 160,
+    },
+    tripList: {
+      gap: spacing.md,
+    },
+    section: {
+      marginTop: spacing.lg,
+    },
+    activityList: {
+      gap: spacing.md,
+    },
+  });
+}

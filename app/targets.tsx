@@ -3,7 +3,7 @@ import { AppHeader, EmptyState, ScreenContainer } from "@/src/components";
 import { TargetCard } from "@/src/components/TargetCard";
 import { db } from "@/src/db/client";
 import { activities, categories, targets, trips } from "@/src/db/schema";
-import { colours, spacing } from "@/src/theme";
+import { useTheme, type Colours, spacing } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { and, eq, gte, sql } from "drizzle-orm";
 import { useFocusEffect, useRouter } from "expo-router";
@@ -43,6 +43,8 @@ function getMonthStart(): string {
 export default function TargetsScreen() {
   const router = useRouter();
   const { user } = useAuth();
+  const { colours } = useTheme();
+  const styles = makeStyles(colours);
   const [targetList, setTargetList] = useState<TargetRow[]>([]);
 
   useFocusEffect(
@@ -242,21 +244,23 @@ export default function TargetsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  topBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: spacing.sm,
-  },
-  backButton: {
-    paddingVertical: spacing.xs,
-  },
-  addButton: {
-    paddingVertical: spacing.xs,
-  },
-  list: {
-    gap: spacing.md,
-    paddingBottom: spacing["3xl"],
-  },
-});
+function makeStyles(c: Colours) {
+  return StyleSheet.create({
+    topBar: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingVertical: spacing.sm,
+    },
+    backButton: {
+      paddingVertical: spacing.xs,
+    },
+    addButton: {
+      paddingVertical: spacing.xs,
+    },
+    list: {
+      gap: spacing.md,
+      paddingBottom: spacing["3xl"],
+    },
+  });
+}

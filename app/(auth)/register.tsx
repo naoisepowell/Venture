@@ -1,21 +1,22 @@
 import { useAuth } from "@/src/auth";
 import { AppHeader, PrimaryButton, ScreenContainer } from "@/src/components";
-import { colours, radii, spacing, typography } from "@/src/theme";
+import { useTheme, type Colours, radii, spacing, typography } from "@/src/theme";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
-
 
 // registration screen for new users to create an account and access the app's features
 export default function RegisterScreen() {
   const router = useRouter();
   const { register } = useAuth();
+  const { colours } = useTheme();
+  const styles = makeStyles(colours);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  
+
   // handles registration process and sends user to dashboard
   const handleRegister = async () => {
     setLoading(true);
@@ -31,7 +32,6 @@ export default function RegisterScreen() {
     }
   };
 
-  // renders the registration form with input fields for name, email, and password, along with a button to submit the form and a link to the login screen for existing users
   return (
     <ScreenContainer>
       <AppHeader
@@ -99,44 +99,46 @@ export default function RegisterScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  form: {
-    marginTop: spacing.xl,
-    gap: spacing.base,
-  },
-  inputGroup: {
-    gap: spacing.xs,
-  },
-  label: {
-    ...typography.captionMedium,
-    color: colours.textPrimary,
-  },
-  input: {
-    height: 48,
-    borderWidth: 1,
-    borderColor: colours.border,
-    borderRadius: radii.md,
-    paddingHorizontal: spacing.base,
-    ...typography.body,
-    color: colours.textPrimary,
-    backgroundColor: colours.surface,
-  },
-  button: {
-    marginTop: spacing.sm,
-  },
-  footerText: {
-    ...typography.caption,
-    color: colours.textSecondary,
-    textAlign: "center",
-    marginTop: spacing.md,
-  },
-  link: {
-    color: colours.primary,
-    fontWeight: "600",
-  },
-  error: {
-    ...typography.caption,
-    color: colours.danger,
-    marginBottom: spacing.base,
-  },
-});
+function makeStyles(c: Colours) {
+  return StyleSheet.create({
+    form: {
+      marginTop: spacing.xl,
+      gap: spacing.base,
+    },
+    inputGroup: {
+      gap: spacing.xs,
+    },
+    label: {
+      ...typography.captionMedium,
+      color: c.textPrimary,
+    },
+    input: {
+      height: 48,
+      borderWidth: 1,
+      borderColor: c.border,
+      borderRadius: radii.md,
+      paddingHorizontal: spacing.base,
+      ...typography.body,
+      color: c.textPrimary,
+      backgroundColor: c.surface,
+    },
+    button: {
+      marginTop: spacing.sm,
+    },
+    footerText: {
+      ...typography.caption,
+      color: c.textSecondary,
+      textAlign: "center",
+      marginTop: spacing.md,
+    },
+    link: {
+      color: c.primary,
+      fontWeight: "600",
+    },
+    error: {
+      ...typography.caption,
+      color: c.danger,
+      marginBottom: spacing.base,
+    },
+  });
+}

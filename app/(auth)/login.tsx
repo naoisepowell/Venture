@@ -1,6 +1,6 @@
 import { useAuth } from "@/src/auth";
 import { AppHeader, PrimaryButton, ScreenContainer } from "@/src/components";
-import { colours, radii, spacing, typography } from "@/src/theme";
+import { useTheme, type Colours, radii, spacing, typography } from "@/src/theme";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
@@ -8,6 +8,8 @@ import { StyleSheet, Text, TextInput, View } from "react-native";
 export default function LoginScreen() {
   const router = useRouter();
   const { login } = useAuth();
+  const { colours } = useTheme();
+  const styles = makeStyles(colours);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -85,44 +87,46 @@ export default function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  form: {
-    marginTop: spacing.xl,
-    gap: spacing.base,
-  },
-  inputGroup: {
-    gap: spacing.xs,
-  },
-  label: {
-    ...typography.captionMedium,
-    color: colours.textPrimary,
-  },
-  input: {
-    height: 48,
-    borderWidth: 1,
-    borderColor: colours.border,
-    borderRadius: radii.md,
-    paddingHorizontal: spacing.base,
-    ...typography.body,
-    color: colours.textPrimary,
-    backgroundColor: colours.surface,
-  },
-  button: {
-    marginTop: spacing.sm,
-  },
-  footerText: {
-    ...typography.caption,
-    color: colours.textSecondary,
-    textAlign: "center",
-    marginTop: spacing.md,
-  },
-  link: {
-    color: colours.primary,
-    fontWeight: "600",
-  },
-  error: {
-    ...typography.caption,
-    color: colours.danger,
-    marginBottom: spacing.base,
-  },
-});
+function makeStyles(c: Colours) {
+  return StyleSheet.create({
+    form: {
+      marginTop: spacing.xl,
+      gap: spacing.base,
+    },
+    inputGroup: {
+      gap: spacing.xs,
+    },
+    label: {
+      ...typography.captionMedium,
+      color: c.textPrimary,
+    },
+    input: {
+      height: 48,
+      borderWidth: 1,
+      borderColor: c.border,
+      borderRadius: radii.md,
+      paddingHorizontal: spacing.base,
+      ...typography.body,
+      color: c.textPrimary,
+      backgroundColor: c.surface,
+    },
+    button: {
+      marginTop: spacing.sm,
+    },
+    footerText: {
+      ...typography.caption,
+      color: c.textSecondary,
+      textAlign: "center",
+      marginTop: spacing.md,
+    },
+    link: {
+      color: c.primary,
+      fontWeight: "600",
+    },
+    error: {
+      ...typography.caption,
+      color: c.danger,
+      marginBottom: spacing.base,
+    },
+  });
+}

@@ -5,7 +5,7 @@ import {
   Text,
   ViewStyle,
 } from "react-native";
-import { colours, typography, radii, spacing } from "@/src/theme";
+import { useTheme, type Colours, typography, radii, spacing } from "@/src/theme";
 
 interface PrimaryButtonProps {
   title: string;
@@ -24,6 +24,8 @@ export function PrimaryButton({
   variant = "filled",
   style,
 }: PrimaryButtonProps) {
+  const { colours } = useTheme();
+  const styles = makeStyles(colours);
   const isFilled = variant === "filled";
 
   return (
@@ -57,38 +59,40 @@ export function PrimaryButton({
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    height: 52,
-    borderRadius: radii.md,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: spacing.xl,
-  },
-  filled: {
-    backgroundColor: colours.primary,
-  },
-  filledPressed: {
-    backgroundColor: colours.primaryDark,
-  },
-  outline: {
-    backgroundColor: "transparent",
-    borderWidth: 1.5,
-    borderColor: colours.primary,
-  },
-  outlinePressed: {
-    backgroundColor: colours.primaryFaint,
-  },
-  disabled: {
-    opacity: 0.5,
-  },
-  label: {
-    ...typography.button,
-  },
-  filledLabel: {
-    color: colours.textInverse,
-  },
-  outlineLabel: {
-    color: colours.primary,
-  },
-});
+function makeStyles(c: Colours) {
+  return StyleSheet.create({
+    base: {
+      height: 52,
+      borderRadius: radii.md,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: spacing.xl,
+    },
+    filled: {
+      backgroundColor: c.primary,
+    },
+    filledPressed: {
+      backgroundColor: c.primaryDark,
+    },
+    outline: {
+      backgroundColor: "transparent",
+      borderWidth: 1.5,
+      borderColor: c.primary,
+    },
+    outlinePressed: {
+      backgroundColor: c.primaryFaint,
+    },
+    disabled: {
+      opacity: 0.5,
+    },
+    label: {
+      ...typography.button,
+    },
+    filledLabel: {
+      color: c.textInverse,
+    },
+    outlineLabel: {
+      color: c.primary,
+    },
+  });
+}

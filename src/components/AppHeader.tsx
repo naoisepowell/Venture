@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, ViewStyle } from "react-native";
-import { colours, typography, spacing } from "@/src/theme";
+import { useTheme, type Colours, typography, spacing } from "@/src/theme";
 
 interface AppHeaderProps {
   title: string;
@@ -8,6 +8,9 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ title, subtitle, style }: AppHeaderProps) {
+  const { colours } = useTheme();
+  const styles = makeStyles(colours);
+
   return (
     <View style={[styles.container, style]}>
       <Text style={styles.title}>{title}</Text>
@@ -18,18 +21,20 @@ export function AppHeader({ title, subtitle, style }: AppHeaderProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.base,
-  },
-  title: {
-    ...typography.largeTitle,
-    color: colours.textPrimary,
-  },
-  subtitle: {
-    ...typography.caption,
-    color: colours.textSecondary,
-    marginTop: spacing.xs,
-  },
-});
+function makeStyles(c: Colours) {
+  return StyleSheet.create({
+    container: {
+      paddingTop: spacing.lg,
+      paddingBottom: spacing.base,
+    },
+    title: {
+      ...typography.largeTitle,
+      color: c.textPrimary,
+    },
+    subtitle: {
+      ...typography.caption,
+      color: c.textSecondary,
+      marginTop: spacing.xs,
+    },
+  });
+}

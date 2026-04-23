@@ -3,7 +3,7 @@ import { AppHeader, EmptyState, ScreenContainer } from "@/src/components";
 import { TripCard } from "@/src/components/TripCard";
 import { db } from "@/src/db/client";
 import { trips } from "@/src/db/schema";
-import { colours, spacing } from "@/src/theme";
+import { useTheme, spacing } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { desc, eq } from "drizzle-orm";
 import { useFocusEffect, useRouter } from "expo-router";
@@ -24,6 +24,7 @@ interface Trip {
 export default function TripsScreen() {
   const router = useRouter();
   const { user } = useAuth();
+  const { colours } = useTheme();
   const [tripList, setTripList] = useState<Trip[]>([]);
 
   useFocusEffect(

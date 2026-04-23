@@ -1,4 +1,4 @@
-import { colours, radii, spacing, typography } from "@/src/theme";
+import { useTheme, type Colours, radii, spacing, typography } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -57,6 +57,8 @@ export function ActivityCard({
   onPress,
   onLongPress,
 }: ActivityCardProps) {
+  const { colours } = useTheme();
+  const styles = makeStyles(colours);
   const s = statusLabel(status);
 
   return (
@@ -117,79 +119,81 @@ export function ActivityCard({
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colours.surface,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-    borderColor: colours.borderLight,
-    padding: spacing.base,
-    gap: spacing.sm,
-  },
-  cardPressed: {
-    backgroundColor: colours.primaryFaint,
-  },
-  topRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    gap: spacing.sm,
-  },
-  titleArea: {
-    flex: 1,
-    gap: 2,
-  },
-  title: {
-    ...typography.bodyMedium,
-    color: colours.textPrimary,
-  },
-  tripLabel: {
-    ...typography.small,
-    color: colours.textTertiary,
-  },
-  statusBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.xs,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 3,
-    borderRadius: radii.full,
-  },
-  statusDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-  },
-  statusText: {
-    ...typography.small,
-    fontWeight: "600",
-  },
-  detailsRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: spacing.md,
-  },
-  detail: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 3,
-  },
-  detailText: {
-    ...typography.small,
-    color: colours.textSecondary,
-  },
-  categoryRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.xs,
-  },
-  categoryDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  categoryText: {
-    ...typography.small,
-    color: colours.textSecondary,
-  },
-});
+function makeStyles(c: Colours) {
+  return StyleSheet.create({
+    card: {
+      backgroundColor: c.surface,
+      borderRadius: radii.lg,
+      borderWidth: 1,
+      borderColor: c.borderLight,
+      padding: spacing.base,
+      gap: spacing.sm,
+    },
+    cardPressed: {
+      backgroundColor: c.primaryFaint,
+    },
+    topRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "flex-start",
+      gap: spacing.sm,
+    },
+    titleArea: {
+      flex: 1,
+      gap: 2,
+    },
+    title: {
+      ...typography.bodyMedium,
+      color: c.textPrimary,
+    },
+    tripLabel: {
+      ...typography.small,
+      color: c.textTertiary,
+    },
+    statusBadge: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.xs,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 3,
+      borderRadius: radii.full,
+    },
+    statusDot: {
+      width: 6,
+      height: 6,
+      borderRadius: 3,
+    },
+    statusText: {
+      ...typography.small,
+      fontWeight: "600",
+    },
+    detailsRow: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: spacing.md,
+    },
+    detail: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 3,
+    },
+    detailText: {
+      ...typography.small,
+      color: c.textSecondary,
+    },
+    categoryRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.xs,
+    },
+    categoryDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+    },
+    categoryText: {
+      ...typography.small,
+      color: c.textSecondary,
+    },
+  });
+}

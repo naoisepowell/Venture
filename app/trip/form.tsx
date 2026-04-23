@@ -2,7 +2,7 @@ import { useAuth } from "@/src/auth";
 import { PrimaryButton, ScreenContainer } from "@/src/components";
 import { db } from "@/src/db/client";
 import { trips } from "@/src/db/schema";
-import { colours, radii, spacing, typography } from "@/src/theme";
+import { useTheme, type Colours, radii, spacing, typography } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { eq } from "drizzle-orm";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -25,9 +25,11 @@ const THEME_COLOURS = [
 export default function TripFormScreen() {
   const router = useRouter();
   const { user } = useAuth();
+  const { colours } = useTheme();
+  const styles = makeStyles(colours);
   const { tripId } = useLocalSearchParams<{ tripId?: string }>();
   const isEditing = !!tripId;
- 
+
   const [title, setTitle] = useState("");
   const [countryOrRegion, setCountryOrRegion] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -233,85 +235,87 @@ export default function TripFormScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  topBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: spacing.sm,
-  },
-  backButton: {
-    width: 40,
-    alignItems: "flex-start",
-  },
-  screenTitle: {
-    ...typography.subtitle,
-    color: colours.textPrimary,
-  },
-  scroll: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingTop: spacing.base,
-    paddingBottom: spacing["3xl"],
-    gap: spacing.base,
-  },
-  error: {
-    ...typography.caption,
-    color: colours.danger,
-    textAlign: "center",
-    backgroundColor: "#FEF2F2",
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.base,
-    borderRadius: radii.sm,
-    overflow: "hidden",
-  },
-  field: {
-    gap: spacing.xs,
-  },
-  label: {
-    ...typography.captionMedium,
-    color: colours.textPrimary,
-  },
-  input: {
-    height: 48,
-    borderWidth: 1,
-    borderColor: colours.border,
-    borderRadius: radii.md,
-    paddingHorizontal: spacing.base,
-    ...typography.body,
-    color: colours.textPrimary,
-    backgroundColor: colours.surface,
-  },
-  textArea: {
-    height: 90,
-    paddingTop: spacing.md,
-  },
-  dateRow: {
-    flexDirection: "row",
-    gap: spacing.md,
-  },
-  dateField: {
-    flex: 1,
-    gap: spacing.xs,
-  },
-  colourRow: {
-    flexDirection: "row",
-    gap: spacing.sm,
-    flexWrap: "wrap",
-  },
-  colourSwatch: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  colourSelected: {
-    borderWidth: 2.5,
-    borderColor: colours.textPrimary,
-  },
-  saveButton: {
-    marginTop: spacing.sm,
-  },
-});
+function makeStyles(c: Colours) {
+  return StyleSheet.create({
+    topBar: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingVertical: spacing.sm,
+    },
+    backButton: {
+      width: 40,
+      alignItems: "flex-start",
+    },
+    screenTitle: {
+      ...typography.subtitle,
+      color: c.textPrimary,
+    },
+    scroll: {
+      flex: 1,
+    },
+    scrollContent: {
+      paddingTop: spacing.base,
+      paddingBottom: spacing["3xl"],
+      gap: spacing.base,
+    },
+    error: {
+      ...typography.caption,
+      color: c.danger,
+      textAlign: "center",
+      backgroundColor: "#FEF2F2",
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.base,
+      borderRadius: radii.sm,
+      overflow: "hidden",
+    },
+    field: {
+      gap: spacing.xs,
+    },
+    label: {
+      ...typography.captionMedium,
+      color: c.textPrimary,
+    },
+    input: {
+      height: 48,
+      borderWidth: 1,
+      borderColor: c.border,
+      borderRadius: radii.md,
+      paddingHorizontal: spacing.base,
+      ...typography.body,
+      color: c.textPrimary,
+      backgroundColor: c.surface,
+    },
+    textArea: {
+      height: 90,
+      paddingTop: spacing.md,
+    },
+    dateRow: {
+      flexDirection: "row",
+      gap: spacing.md,
+    },
+    dateField: {
+      flex: 1,
+      gap: spacing.xs,
+    },
+    colourRow: {
+      flexDirection: "row",
+      gap: spacing.sm,
+      flexWrap: "wrap",
+    },
+    colourSwatch: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    colourSelected: {
+      borderWidth: 2.5,
+      borderColor: c.textPrimary,
+    },
+    saveButton: {
+      marginTop: spacing.sm,
+    },
+  });
+}

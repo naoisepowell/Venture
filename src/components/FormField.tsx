@@ -1,4 +1,4 @@
-import { colours, radii, spacing, typography } from "@/src/theme";
+import { useTheme, type Colours, radii, spacing, typography } from "@/src/theme";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 
 // Defines the props a form field needs to render and handle input
@@ -20,6 +20,9 @@ export function FormField({
   secureTextEntry,
   keyboardType = "default",
 }: FormFieldProps) {
+  const { colours } = useTheme();
+  const styles = makeStyles(colours);
+
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
@@ -36,22 +39,24 @@ export function FormField({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    gap: spacing.xs,
-  },
-  label: {
-    ...typography.captionMedium,
-    color: colours.textSecondary,
-  },
-  input: {
-    height: 44,
-    borderWidth: 1,
-    borderColor: colours.border,
-    borderRadius: radii.md,
-    paddingHorizontal: spacing.md,
-    ...typography.body,
-    color: colours.textPrimary,
-    backgroundColor: colours.surface,
-  },
-});
+function makeStyles(c: Colours) {
+  return StyleSheet.create({
+    container: {
+      gap: spacing.xs,
+    },
+    label: {
+      ...typography.captionMedium,
+      color: c.textSecondary,
+    },
+    input: {
+      height: 44,
+      borderWidth: 1,
+      borderColor: c.border,
+      borderRadius: radii.md,
+      paddingHorizontal: spacing.md,
+      ...typography.body,
+      color: c.textPrimary,
+      backgroundColor: c.surface,
+    },
+  });
+}

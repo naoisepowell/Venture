@@ -2,7 +2,7 @@ import { useAuth } from "@/src/auth";
 import { PrimaryButton, ScreenContainer } from "@/src/components";
 import { db } from "@/src/db/client";
 import { categories, targets, trips } from "@/src/db/schema";
-import { colours, radii, spacing, typography } from "@/src/theme";
+import { useTheme, type Colours, radii, spacing, typography } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { eq } from "drizzle-orm";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -38,6 +38,8 @@ interface PickerItem {
 export default function TargetFormScreen() {
   const router = useRouter();
   const { user } = useAuth();
+  const { colours } = useTheme();
+  const styles = makeStyles(colours);
   const { targetId } = useLocalSearchParams<{ targetId?: string }>();
   const isEditing = !!targetId;
   // Stores available trips and categories for selection
@@ -321,98 +323,100 @@ export default function TargetFormScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  topBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: spacing.sm,
-  },
-  backButton: {
-    width: 40,
-    alignItems: "flex-start",
-  },
-  screenTitle: {
-    ...typography.subtitle,
-    color: colours.textPrimary,
-  },
-  scroll: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingTop: spacing.base,
-    paddingBottom: spacing["3xl"],
-    gap: spacing.xl,
-  },
-  error: {
-    ...typography.caption,
-    color: colours.danger,
-    textAlign: "center",
-    backgroundColor: "#FEF2F2",
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.base,
-    borderRadius: radii.sm,
-    overflow: "hidden",
-  },
-  field: {
-    gap: spacing.sm,
-  },
-  label: {
-    ...typography.captionMedium,
-    color: colours.textPrimary,
-  },
-  input: {
-    height: 48,
-    borderWidth: 1,
-    borderColor: colours.border,
-    borderRadius: radii.md,
-    paddingHorizontal: spacing.base,
-    ...typography.body,
-    color: colours.textPrimary,
-    backgroundColor: colours.surface,
-  },
-  row: {
-    flexDirection: "row",
-    gap: spacing.md,
-  },
-  chipRow: {
-    flexDirection: "row",
-    gap: spacing.sm,
-    flexWrap: "wrap",
-  },
-  chip: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: radii.full,
-    borderWidth: 1,
-    borderColor: colours.border,
-    backgroundColor: colours.surface,
-  },
-  chipSmall: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: radii.full,
-    borderWidth: 1,
-    borderColor: colours.border,
-    backgroundColor: colours.surface,
-  },
-  chipSelected: {
-    backgroundColor: colours.primaryFaint,
-    borderColor: colours.primary,
-  },
-  chipText: {
-    ...typography.caption,
-    color: colours.textSecondary,
-  },
-  chipTextSmall: {
-    ...typography.small,
-    color: colours.textSecondary,
-  },
-  chipTextSelected: {
-    color: colours.primary,
-    fontWeight: "600",
-  },
-  saveButton: {
-    marginTop: spacing.sm,
-  },
-});
+function makeStyles(c: Colours) {
+  return StyleSheet.create({
+    topBar: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingVertical: spacing.sm,
+    },
+    backButton: {
+      width: 40,
+      alignItems: "flex-start",
+    },
+    screenTitle: {
+      ...typography.subtitle,
+      color: c.textPrimary,
+    },
+    scroll: {
+      flex: 1,
+    },
+    scrollContent: {
+      paddingTop: spacing.base,
+      paddingBottom: spacing["3xl"],
+      gap: spacing.xl,
+    },
+    error: {
+      ...typography.caption,
+      color: c.danger,
+      textAlign: "center",
+      backgroundColor: "#FEF2F2",
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.base,
+      borderRadius: radii.sm,
+      overflow: "hidden",
+    },
+    field: {
+      gap: spacing.sm,
+    },
+    label: {
+      ...typography.captionMedium,
+      color: c.textPrimary,
+    },
+    input: {
+      height: 48,
+      borderWidth: 1,
+      borderColor: c.border,
+      borderRadius: radii.md,
+      paddingHorizontal: spacing.base,
+      ...typography.body,
+      color: c.textPrimary,
+      backgroundColor: c.surface,
+    },
+    row: {
+      flexDirection: "row",
+      gap: spacing.md,
+    },
+    chipRow: {
+      flexDirection: "row",
+      gap: spacing.sm,
+      flexWrap: "wrap",
+    },
+    chip: {
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      borderRadius: radii.full,
+      borderWidth: 1,
+      borderColor: c.border,
+      backgroundColor: c.surface,
+    },
+    chipSmall: {
+      paddingHorizontal: spacing.sm,
+      paddingVertical: spacing.xs,
+      borderRadius: radii.full,
+      borderWidth: 1,
+      borderColor: c.border,
+      backgroundColor: c.surface,
+    },
+    chipSelected: {
+      backgroundColor: c.primaryFaint,
+      borderColor: c.primary,
+    },
+    chipText: {
+      ...typography.caption,
+      color: c.textSecondary,
+    },
+    chipTextSmall: {
+      ...typography.small,
+      color: c.textSecondary,
+    },
+    chipTextSelected: {
+      color: c.primary,
+      fontWeight: "600",
+    },
+    saveButton: {
+      marginTop: spacing.sm,
+    },
+  });
+}

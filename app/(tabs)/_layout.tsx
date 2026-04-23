@@ -1,6 +1,6 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { colours, typography } from "@/src/theme";
+import { useTheme, typography } from "@/src/theme";
 
 type TabIcon = keyof typeof Ionicons.glyphMap;
 
@@ -43,6 +43,8 @@ const TAB_CONFIG: {
 ];
 
 export default function TabsLayout() {
+  const { colours } = useTheme();
+
   return (
     <Tabs
       screenOptions={{

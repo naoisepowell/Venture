@@ -1,4 +1,4 @@
-import { colours, radii, spacing, typography } from "@/src/theme";
+import { useTheme, type Colours, radii, spacing, typography } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -46,6 +46,8 @@ export function TargetCard({
   onPress,
   onLongPress,
 }: TargetCardProps) {
+  const { colours } = useTheme();
+  const styles = makeStyles(colours);
   const remaining = Math.max(0, targetValue - currentValue); // How much is left to get target
   const progress = targetValue > 0 ? Math.min(currentValue / targetValue, 1) : 0; // Progress as value between 0 and 1
   const status = getStatus(currentValue, targetValue); // Current status details for the target
@@ -123,87 +125,89 @@ export function TargetCard({
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colours.surface,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-    borderColor: colours.borderLight,
-    padding: spacing.base,
-    gap: spacing.sm,
-  },
-  cardPressed: {
-    backgroundColor: colours.primaryFaint,
-  },
-  topRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    gap: spacing.sm,
-  },
-  titleArea: {
-    flex: 1,
-    gap: 2,
-  },
-  metricLabel: {
-    ...typography.bodyMedium,
-    color: colours.textPrimary,
-  },
-  periodLabel: {
-    ...typography.small,
-    color: colours.textTertiary,
-  },
-  statusBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.xs,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 3,
-    borderRadius: radii.full,
-  },
-  statusText: {
-    ...typography.small,
-    fontWeight: "600",
-  },
-  progressBarBg: {
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colours.borderLight,
-    overflow: "hidden",
-  },
-  progressBarFill: {
-    height: 6,
-    borderRadius: 3,
-  },
-  statsRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  statText: {
-    ...typography.small,
-    color: colours.textSecondary,
-  },
-  remainingText: {
-    ...typography.small,
-    color: colours.textTertiary,
-  },
-  tagsRow: {
-    flexDirection: "row",
-    gap: spacing.md,
-  },
-  tag: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.xs,
-  },
-  tagText: {
-    ...typography.small,
-    color: colours.textTertiary,
-  },
-  catDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-});
+function makeStyles(c: Colours) {
+  return StyleSheet.create({
+    card: {
+      backgroundColor: c.surface,
+      borderRadius: radii.lg,
+      borderWidth: 1,
+      borderColor: c.borderLight,
+      padding: spacing.base,
+      gap: spacing.sm,
+    },
+    cardPressed: {
+      backgroundColor: c.primaryFaint,
+    },
+    topRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "flex-start",
+      gap: spacing.sm,
+    },
+    titleArea: {
+      flex: 1,
+      gap: 2,
+    },
+    metricLabel: {
+      ...typography.bodyMedium,
+      color: c.textPrimary,
+    },
+    periodLabel: {
+      ...typography.small,
+      color: c.textTertiary,
+    },
+    statusBadge: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.xs,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 3,
+      borderRadius: radii.full,
+    },
+    statusText: {
+      ...typography.small,
+      fontWeight: "600",
+    },
+    progressBarBg: {
+      height: 6,
+      borderRadius: 3,
+      backgroundColor: c.borderLight,
+      overflow: "hidden",
+    },
+    progressBarFill: {
+      height: 6,
+      borderRadius: 3,
+    },
+    statsRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    statText: {
+      ...typography.small,
+      color: c.textSecondary,
+    },
+    remainingText: {
+      ...typography.small,
+      color: c.textTertiary,
+    },
+    tagsRow: {
+      flexDirection: "row",
+      gap: spacing.md,
+    },
+    tag: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.xs,
+    },
+    tagText: {
+      ...typography.small,
+      color: c.textTertiary,
+    },
+    catDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+    },
+  });
+}

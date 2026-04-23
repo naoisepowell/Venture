@@ -3,7 +3,7 @@ import { AppHeader, EmptyState, ScreenContainer } from "@/src/components";
 import { ActivityCard } from "@/src/components/ActivityCard";
 import { db } from "@/src/db/client";
 import { activities, categories, trips } from "@/src/db/schema";
-import { colours, radii, spacing, typography } from "@/src/theme";
+import { useTheme, type Colours, radii, spacing, typography } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { desc, eq } from "drizzle-orm";
 import { useFocusEffect, useRouter } from "expo-router";
@@ -54,6 +54,8 @@ const STATUS_FILTERS = [
 export default function ActivitiesScreen() {
   const router = useRouter();
   const { user } = useAuth();
+  const { colours } = useTheme();
+  const styles = makeStyles(colours);
   const [activityList, setActivityList] = useState<ActivityRow[]>([]); // Stores activities
   const [tripOptions, setTripOptions] = useState<TripOption[]>([]); // Stores trip filter options
   const [categoryOptions, setCategoryOptions] = useState<CategoryOption[]>([]); // Stores category filter options
@@ -315,77 +317,79 @@ export default function ActivitiesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-  },
-  addButton: {
-    paddingTop: spacing.lg,
-  },
-  searchRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    height: 42,
-    borderWidth: 1,
-    borderColor: colours.border,
-    borderRadius: radii.md,
-    paddingHorizontal: spacing.md,
-    backgroundColor: colours.surface,
-    gap: spacing.sm,
-    marginBottom: spacing.sm,
-  },
-  searchInput: {
-    flex: 1,
-    ...typography.caption,
-    color: colours.textPrimary,
-    height: 42,
-    padding: 0,
-  },
-  filterSection: {
-    gap: spacing.sm,
-    marginBottom: spacing.md,
-  },
-  filterRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: spacing.xs,
-  },
-  filterChip: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: radii.full,
-    borderWidth: 1,
-    borderColor: colours.border,
-    backgroundColor: colours.surface,
-  },
-  filterChipActive: {
-    backgroundColor: colours.primaryFaint,
-    borderColor: colours.primary,
-  },
-  filterChipText: {
-    ...typography.small,
-    color: colours.textSecondary,
-  },
-  filterChipTextActive: {
-    color: colours.primary,
-    fontWeight: "600",
-  },
-  clearButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: spacing.xs,
-    paddingVertical: spacing.xs,
-  },
-  clearButtonText: {
-    ...typography.small,
-    color: colours.primary,
-    fontWeight: "500",
-  },
-  list: {
-    gap: spacing.md,
-    paddingBottom: spacing["3xl"],
-  },
-});
+function makeStyles(c: Colours) {
+  return StyleSheet.create({
+    headerRow: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+    },
+    addButton: {
+      paddingTop: spacing.lg,
+    },
+    searchRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      height: 42,
+      borderWidth: 1,
+      borderColor: c.border,
+      borderRadius: radii.md,
+      paddingHorizontal: spacing.md,
+      backgroundColor: c.surface,
+      gap: spacing.sm,
+      marginBottom: spacing.sm,
+    },
+    searchInput: {
+      flex: 1,
+      ...typography.caption,
+      color: c.textPrimary,
+      height: 42,
+      padding: 0,
+    },
+    filterSection: {
+      gap: spacing.sm,
+      marginBottom: spacing.md,
+    },
+    filterRow: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: spacing.xs,
+    },
+    filterChip: {
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.xs,
+      borderRadius: radii.full,
+      borderWidth: 1,
+      borderColor: c.border,
+      backgroundColor: c.surface,
+    },
+    filterChipActive: {
+      backgroundColor: c.primaryFaint,
+      borderColor: c.primary,
+    },
+    filterChipText: {
+      ...typography.small,
+      color: c.textSecondary,
+    },
+    filterChipTextActive: {
+      color: c.primary,
+      fontWeight: "600",
+    },
+    clearButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: spacing.xs,
+      paddingVertical: spacing.xs,
+    },
+    clearButtonText: {
+      ...typography.small,
+      color: c.primary,
+      fontWeight: "500",
+    },
+    list: {
+      gap: spacing.md,
+      paddingBottom: spacing["3xl"],
+    },
+  });
+}

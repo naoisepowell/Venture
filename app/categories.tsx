@@ -3,7 +3,7 @@ import { AppHeader, EmptyState, ScreenContainer } from "@/src/components";
 import { CategoryCard } from "@/src/components/CategoryCard";
 import { db } from "@/src/db/client";
 import { categories } from "@/src/db/schema";
-import { colours, spacing } from "@/src/theme";
+import { useTheme, spacing } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { eq } from "drizzle-orm";
 import { useFocusEffect, useRouter } from "expo-router";
@@ -21,6 +21,7 @@ interface Category {
 export default function CategoriesScreen() {
   const router = useRouter();
   const { user } = useAuth();
+  const { colours } = useTheme();
   const [categoryList, setCategoryList] = useState<Category[]>([]);
 
   useFocusEffect(

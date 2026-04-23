@@ -1,4 +1,4 @@
-import { colours, radii, spacing, typography } from "@/src/theme";
+import { useTheme, type Colours, radii, spacing, typography } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View, ViewStyle } from "react-native";
 
@@ -19,6 +19,9 @@ export function EmptyState({
   onAction,
   style,
 }: EmptyStateProps) {
+  const { colours } = useTheme();
+  const styles = makeStyles(colours);
+
   return (
     <View style={[styles.container, style]}>
       <Ionicons
@@ -44,40 +47,42 @@ export function EmptyState({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: spacing["2xl"],
-    paddingVertical: spacing["4xl"],
-  },
-  title: {
-    ...typography.subtitle,
-    color: colours.textPrimary,
-    marginTop: spacing.base,
-    textAlign: "center",
-  },
-  message: {
-    ...typography.caption,
-    color: colours.textSecondary,
-    marginTop: spacing.sm,
-    textAlign: "center",
-    lineHeight: 20,
-  },
-  actionButton: {
-    marginTop: spacing.base,
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.sm,
-    borderRadius: radii.full,
-    borderWidth: 1,
-    borderColor: colours.primary,
-  },
-  actionPressed: {
-    backgroundColor: colours.primaryFaint,
-  },
-  actionText: {
-    ...typography.captionMedium,
-    color: colours.primary,
-  },
-});
+function makeStyles(c: Colours) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: spacing["2xl"],
+      paddingVertical: spacing["4xl"],
+    },
+    title: {
+      ...typography.subtitle,
+      color: c.textPrimary,
+      marginTop: spacing.base,
+      textAlign: "center",
+    },
+    message: {
+      ...typography.caption,
+      color: c.textSecondary,
+      marginTop: spacing.sm,
+      textAlign: "center",
+      lineHeight: 20,
+    },
+    actionButton: {
+      marginTop: spacing.base,
+      paddingHorizontal: spacing.xl,
+      paddingVertical: spacing.sm,
+      borderRadius: radii.full,
+      borderWidth: 1,
+      borderColor: c.primary,
+    },
+    actionPressed: {
+      backgroundColor: c.primaryFaint,
+    },
+    actionText: {
+      ...typography.captionMedium,
+      color: c.primary,
+    },
+  });
+}

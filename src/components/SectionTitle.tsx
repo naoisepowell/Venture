@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, ViewStyle } from "react-native";
-import { colours, typography, spacing } from "@/src/theme";
+import { useTheme, type Colours, typography, spacing } from "@/src/theme";
 
 interface SectionTitleProps {
   title: string;
@@ -14,6 +14,9 @@ export function SectionTitle({
   onAction,
   style,
 }: SectionTitleProps) {
+  const { colours } = useTheme();
+  const styles = makeStyles(colours);
+
   return (
     <View style={[styles.container, style]}>
       <Text style={styles.title}>{title}</Text>
@@ -26,19 +29,21 @@ export function SectionTitle({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: spacing.sm,
-  },
-  title: {
-    ...typography.subtitle,
-    color: colours.textPrimary,
-  },
-  action: {
-    ...typography.captionMedium,
-    color: colours.primary,
-  },
-});
+function makeStyles(c: Colours) {
+  return StyleSheet.create({
+    container: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingVertical: spacing.sm,
+    },
+    title: {
+      ...typography.subtitle,
+      color: c.textPrimary,
+    },
+    action: {
+      ...typography.captionMedium,
+      color: c.primary,
+    },
+  });
+}

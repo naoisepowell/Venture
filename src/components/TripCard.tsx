@@ -1,4 +1,4 @@
-import { colours, radii, shadows, spacing, typography } from "@/src/theme";
+import { useTheme, type Colours, radii, shadows, spacing, typography } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -36,6 +36,9 @@ export function TripCard({
   themeColour,
   onPress,
 }: TripCardProps) {
+  const { colours } = useTheme();
+  const styles = makeStyles(colours);
+
   return (
     <Pressable
       onPress={onPress}
@@ -75,59 +78,61 @@ export function TripCard({
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    flexDirection: "row",
-    backgroundColor: colours.surface,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-    borderColor: colours.borderLight,
-    overflow: "hidden",
-    ...shadows.sm,
-  },
-  cardPressed: {
-    backgroundColor: colours.primaryFaint,
-  },
-  accent: {
-    width: 5,
-  },
-  content: {
-    flex: 1,
-    padding: spacing.base,
-    gap: spacing.xs,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  title: {
-    ...typography.bodyMedium,
-    color: colours.textPrimary,
-    flex: 1,
-    marginRight: spacing.sm,
-  },
-  locationRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.xs,
-  },
-  location: {
-    ...typography.caption,
-    color: colours.textSecondary,
-  },
-  dateRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.xs,
-  },
-  dates: {
-    ...typography.small,
-    color: colours.textTertiary,
-  },
-  description: {
-    ...typography.caption,
-    color: colours.textSecondary,
-    marginTop: spacing.xs,
-  },
-});
+function makeStyles(c: Colours) {
+  return StyleSheet.create({
+    card: {
+      flexDirection: "row",
+      backgroundColor: c.surface,
+      borderRadius: radii.lg,
+      borderWidth: 1,
+      borderColor: c.borderLight,
+      overflow: "hidden",
+      ...shadows.sm,
+    },
+    cardPressed: {
+      backgroundColor: c.primaryFaint,
+    },
+    accent: {
+      width: 5,
+    },
+    content: {
+      flex: 1,
+      padding: spacing.base,
+      gap: spacing.xs,
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    title: {
+      ...typography.bodyMedium,
+      color: c.textPrimary,
+      flex: 1,
+      marginRight: spacing.sm,
+    },
+    locationRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.xs,
+    },
+    location: {
+      ...typography.caption,
+      color: c.textSecondary,
+    },
+    dateRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.xs,
+    },
+    dates: {
+      ...typography.small,
+      color: c.textTertiary,
+    },
+    description: {
+      ...typography.caption,
+      color: c.textSecondary,
+      marginTop: spacing.xs,
+    },
+  });
+}
